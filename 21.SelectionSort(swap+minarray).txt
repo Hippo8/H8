@@ -1,0 +1,79 @@
+Usando minarray(array,size)
+ e la procedura swap(array,x,y)
+ (che scambia i valori di array[x]
+ e array[y]
+), scrivere una funzione ricorsiva per ordinare un array di numeri interi chiamata selection_sort
+:
+
+Il seguente codice in C implementa la funzione selection_sort
+ (convertilo in RISC-V):
+void selection_sort(int array[], int size) {
+    if (size <= 1) 
+        return;
+    
+    int min_idx = minarray(array, size);
+    swap(array, 0, min_idx);
+    selection_sort(array+1, size-1);
+}  
+selection_sort
+ non ritorna alcun valore, ma modifica l'array passato come parametro direttamente in memoria.
+Attenzione:
+NON INCOLLARE IL CODICE DI swap
+ e minarray
+ NELLA RISPOSTA
+Incollare nel campo di sotto soltanto il contenuto della funzione selectionsort
+ (in RISC-V)
+Attenzione alle convenzioni di chiamata!
+Usare il seguente codice "main" per sviluppo e debugging nel simulatore RARS
+####################		CODE		##########################
+################################################################################
+# Procedure selection_sort
+#   Input:  a0 = array, a1 = size
+#   Output: none
+################################################################################
+selection_sort:
+	bne	a1,zero, selection_sort_continue
+	ret
+selection_sort_continue:
+	addi sp,sp,-32
+	sd	ra,24(sp)
+	sd  s0,16(sp)
+	sd  s1,8(sp)
+
+	mv	s1,a0
+	mv	s0,a1
+	call minarray
+
+	mv	a2,a0
+	li	a1,0
+	mv	a0,s1
+	call swap
+
+	addi a1,s0,-1
+	addi a0,s1,4
+	call selection_sort
+
+	ld	 ra,24(sp)
+	ld	 s0,16(sp)
+	ld	 s1,8(sp)
+	addi sp,sp,32
+	jr	ra
+
+
+
+  .globl _start
+  .data
+    size:  .word  10
+    array: .word  3,1,6,6,23,17,9,25,3,4
+  
+  .text
+  _start:
+      # chiama selection_sort
+      la   a0, array
+      la   a1, size
+      lw   a1, 0(a1)
+      jal  ra, selection_sort
+      
+      #exit
+      li   a7, 10
+      ecall 
