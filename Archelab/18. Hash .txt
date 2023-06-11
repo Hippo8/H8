@@ -1,0 +1,67 @@
+Usando il linguaggio assemblativo del RISC-V, scrivere una funzione hash
+ che riceva sul registro a0
+ l'indirizzo in memoria di una stringa (array di byte).
+
+La funzione deve calcolare il valore hash della stringa e ritornarlo sul registro a0
+. Il valore hash deve essere calcolato come segue:
+
+long hash(char *str) {
+    long hash = 5381;
+    int i = 0;
+
+    while (str[i] != '\0') {
+        hash = ((hash << 5) + hash) + str[i];
+        i++;
+    }
+    return hash;
+}
+
+Attenzione:
+Incollare nel campo di sotto soltanto il contenuto della funzione hash
+ (in RISC-V)
+Attenzione alle convenzioni di chiamata!
+Usare il seguente codice "main" per sviluppo e debugging nel simulatore RARS
+##################		CODE		########################
+
+#*******************************************************************************
+# hash()
+#    a0: pointer to string
+#*******************************************************************************
+hash:
+      addi  sp, sp, -40
+      sd    ra, 0(sp)
+
+      lbu   t0,0(a0)
+      li    t1,5381
+hash_loop:
+      beq   t0,zero,hash_exit
+      slli  t2,t1,5
+      add   t1,t2,t1
+      add   t1,t1,t0
+      addi  a0,a0,1
+      lbu   t0,0(a0) 
+      j     hash_loop
+hash_exit:
+      mv    a0,t1
+      ld    ra, 0(sp)
+      addi  sp, sp, 40
+      ret
+
+
+
+
+
+
+.globl _start
+.data
+    str: .string "Hello World!"
+
+.text
+_start:
+    # call hash
+    la  a0, str
+    jal ra, hash
+
+    #exit
+    li   a7, 10
+    ecall
